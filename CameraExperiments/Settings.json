@@ -1,0 +1,11 @@
+{
+  "cameras": [
+    {
+      "FriendlyName": "Ceyomur CY95",
+      "Type": 0,
+      "WifiSSID": "CEYOMUR-xxxxxxxxxxxx",
+      "WifiPassword": "xxxxxxxx",
+      "BluetoothActivate": null
+    }
+  ]
+}
