@@ -7,21 +7,15 @@ using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.Configuration;
 using System.Text.Json;
 
-//var config = new ConfigurationBuilder()
-               //.AddJsonFile("Settings.json", false)
-               //.Build();
-
-//var jCameras = config.GetChildren().FirstOrDefault(c => c.Key == "cameras").GetChildren();
-
 string fileName = "Settings.json";
 string jsonString = File.ReadAllText(fileName);
-var j = JsonSerializer.Deserialize<CamerasList>(jsonString)!;
+var settings = JsonSerializer.Deserialize<CamerasList>(jsonString)!;
 
-
+var cameras = settings.cameras;
 
 //var str = JsonSerializer.Serialize(cameras);
 
-foreach (var camera in j.cameras)
+foreach (var camera in settings.cameras)
 {
     Console.WriteLine("Processing Camera: " + camera.FriendlyName + Environment.NewLine);
     

@@ -21,10 +21,6 @@ namespace CameraExperiments
         public string? WifiSSID { get; set; }
         public string? WifiPassword { get; set; }
         public bool? BluetoothActivate { get; set; }
-    }
-
-    internal class CamerasList
-    {
-        public List<Camera> cameras { get; set; }
+        public string? BluetoothDeviceId { get; set; }
     }
 }

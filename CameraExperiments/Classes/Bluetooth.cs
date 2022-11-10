@@ -10,9 +10,13 @@ namespace CameraExperiments
 {
     internal class BluetoothService
     {
-        public async Task<bool?> BluetoothWakeupAsync(Camera camera)
+        public async Task<bool> BluetoothWakeupAsync(Camera camera)
         {
             bool awoken = false;
+
+            if (camera.BluetoothActivate != true)
+                return awoken;
+
             string? deviceId;
             BluetoothUuid? serviceGuid;
             string? sendCommand;
@@ -20,14 +24,14 @@ namespace CameraExperiments
 
             if (camera.Type == CameraType.Ceyomur)
             {
-                deviceId = "CE3234383230";
+                deviceId = camera.BluetoothDeviceId;
                 serviceGuid = Guid.Parse("0000ffe0-0000-1000-8000-00805f9b34fb");
                 sendCommand = "GPIO3";
                 sleepOnCompletion = 15;
             }
             else
             {
-                return null;
+                return false;
             }
 
             Console.WriteLine("Attempting Bluetooth Activation.");

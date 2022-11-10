@@ -5,7 +5,8 @@
       "Type": 0,
       "WifiSSID": "CEYOMUR-xxxxxxxxxxxx",
       "WifiPassword": "xxxxxxxx",
-      "BluetoothActivate": null
+      "BluetoothActivate": true,
+      "BluetoothDeviceId": "CExxxxxxxxxx"
     }
   ]
 }
