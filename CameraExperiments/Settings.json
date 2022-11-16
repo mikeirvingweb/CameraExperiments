@@ -6,7 +6,18 @@
       "WifiSSID": "CEYOMUR-xxxxxxxxxxxx",
       "WifiPassword": "xxxxxxxx",
       "BluetoothActivate": true,
-      "BluetoothDeviceId": "CExxxxxxxxxx"
+      "BluetoothDeviceId": "CExxxxxxxxxx",
+      "DeleteFiles": false
+    }
+  ],
+  "cameraDetails": [
+    {
+      "Type": 0,
+      "HostNameOrIP": "192.168.8.120",
+      "Secure": false,
+      "ListPath": "?custom=1\u0026cmd=3015",
+      "FetchPath": "DCIM/MOVIE/$FILENAME$",
+      "DeletePath": "DCIM/MOVIE/$FILENAME$?del=1"
     }
   ]
 }

@@ -1,10 +1,5 @@
 ﻿using InTheHand.Bluetooth;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Windows.UI.Text.Core;
 
 namespace CameraExperiments
 {
@@ -100,6 +95,9 @@ namespace CameraExperiments
 
         public async Task<bool?> BluetoothWakeUpAttemptsAsync(Camera camera, int numberOfAttempts)
         {
+            if (camera.BluetoothActivate == false)
+                return null;
+            
             int attempts = 0;
             bool? success = false;
 

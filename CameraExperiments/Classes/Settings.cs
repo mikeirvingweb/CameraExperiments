@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace CameraExperiments
 {
-    internal class CamerasList
+    internal class Settings
     {
-        public List<Camera> cameras { get; set; }
+        public List<Camera>? cameras { get; set; }
+
+        public List<CameraDetails>? cameraDetails { get; set; }
     }
 }

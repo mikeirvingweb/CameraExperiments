@@ -1,16 +1,11 @@
 ﻿using SimpleWifi;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CameraExperiments
 {
     internal class WifiService
     {
-        Wifi wifi = new Wifi();
+        Wifi wifi = new();
 
         public bool WifiAvailable()
         {
@@ -28,6 +23,7 @@ namespace CameraExperiments
         public bool WifiConnect(Camera camera)
         {
             bool success = false;
+            int sleepOnCompletion = 10;
 
             Console.WriteLine("Connecting Wifi Network.");
 
@@ -66,6 +62,19 @@ namespace CameraExperiments
                         }
                     }
                 }
+            }
+
+            if (success && sleepOnCompletion > 0)
+            {
+                Console.Write("Pause after Wifi Connection");
+
+                for (var i = 0; i < sleepOnCompletion; i++)
+                {
+                    Thread.Sleep(1000);
+                    Console.Write(".");
+                }
+
+                Console.WriteLine(Environment.NewLine);
             }
 
             return success;
