@@ -1,1 +1,26 @@
-# CameraExperiments
+
+# Camera Experiments in C#
+📹 C# Functionality for connecting to various\* Wildlife / Security Cameras and downloading their recording files.
+
+\*Currently only connects to the **Ceyomur** cameras, including the **Ceyomur CY95 Solar 4K Trail Camera**. 
+ 
+➕ More camera makes and models will be added over time
+
+## How to use
+
+✏️ Modify *Settings.json* to suit your setup.
+
+`localFilePath` - set this to a folder where files can be downloaded.
+
+*For Ceyomur cameras..*  
+`WifiSSID` - set this to the Wifi SSID of your camera.  
+`WifiPassword` - set this to the Wifi Password of your camera.  
+`BluetoothDeviceId` - set this to the Bluetooth Device ID of your camera.  
+
+### Contributions
+
+🍴 Feel free to Fork / Branch / Modify, raise any Pull Requests for changes.
+
+#### Credits
+
+🙏 Thanks to [Peter Foot](https://github.com/peterfoot) for help with Bluetooth connectivity, achieved using the [InTheHand.BluetoothLE NuGet Package](https://www.nuget.org/packages/InTheHand.BluetoothLE), part of [32feet.NET](https://github.com/inthehand/32feet).
