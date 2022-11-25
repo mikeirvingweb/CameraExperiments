@@ -47,7 +47,7 @@ foreach (var camera in settings.cameras)
                             var fileSize = Convert.ToInt64(file.XPathSelectElement("SIZE")?.Value);
                             var dateTime = Convert.ToDateTime(file.XPathSelectElement("TIME")?.Value);
 
-                            var saveFileName = settings.localFilePath + dateTime.ToString("yyyy-MM-dd-HH-mm-ss") + "_" + camera.FriendlyName?.Replace(" ", "-") + "_" + fileName?.Replace("_", "-");
+                            var saveFileName = settings.localFilePath + "\\" + dateTime.ToString("yyyy-MM-dd-HH-mm-ss") + "_" + camera.FriendlyName?.Replace(" ", "-") + "_" + fileName?.Replace("_", "-");
 
                             var download = await client.GetAsync("http" + (cameraDetail?.Secure == true ? "s" : "") + "://" + cameraDetail?.HostNameOrIP + "/" + cameraDetail?.FetchPath?.Replace("$FILENAME$", fileName));
 
