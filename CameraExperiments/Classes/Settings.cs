@@ -10,7 +10,6 @@ namespace CameraExperiments
     {
         public string? localFilePath { get; set; }
         public List<Camera>? cameras { get; set; }
-
         public List<CameraDetails>? cameraDetails { get; set; }
     }
 }
