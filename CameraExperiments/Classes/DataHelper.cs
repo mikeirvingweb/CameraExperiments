@@ -13,7 +13,7 @@ namespace CameraExperiments
             var cameraDetail = cameraDetails?.Where(cd => cd.Type == camera?.Type).FirstOrDefault();
 
             if (!string.IsNullOrEmpty(camera?.HostNameOrIPOverride))
-                cameraDetail.HostNameOrIP = camera.HostNameOrIPOverride;
+                cameraDetail!.HostNameOrIP = camera.HostNameOrIPOverride;
 
             return cameraDetail;
         }

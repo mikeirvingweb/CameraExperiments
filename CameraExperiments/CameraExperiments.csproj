@@ -1,9 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    
+    <!-- change per target for InTheHand.BluetoothLE version -->
     <!--<TargetFramework>net6.0</TargetFramework>-->
     <TargetFrameworks>net6.0-windows10.0.19041.0</TargetFrameworks>
+    
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -20,5 +22,4 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
 </Project>

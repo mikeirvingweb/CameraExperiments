@@ -6,9 +6,6 @@ using System.Net;
 
 var settings = JsonSerializer.Deserialize<Settings>(File.ReadAllText("Settings.json"))!;
 
-var cameras = settings.cameras;
-var cameraDetails = settings.cameraDetails;
-
 var dataHelper = new DataHelper();
 
 foreach (var camera in settings.cameras)
@@ -29,7 +26,7 @@ foreach (var camera in settings.cameras)
 
             if(success)
             {
-                CameraDetails? cameraDetail = dataHelper.GetCameraDetails(camera, cameraDetails);
+                CameraDetails? cameraDetail = dataHelper.GetCameraDetails(camera, settings.cameraDetails);
 
                 var httpClient = new HttpClient();
 
@@ -50,7 +47,7 @@ foreach (var camera in settings.cameras)
                             var fileSize = Convert.ToInt64(file.XPathSelectElement("SIZE")?.Value);
                             var dateTime = Convert.ToDateTime(file.XPathSelectElement("TIME")?.Value);
 
-                            var saveFileName = @"c:\camera\" + dateTime.ToString("yyyy-MM-dd-hh-mm-ss") + "_" + camera.FriendlyName?.Replace(" ", "-") + "_" + fileName?.Replace("_", "-");
+                            var saveFileName = settings.localFilePath + dateTime.ToString("yyyy-MM-dd-hh-mm-ss") + "_" + camera.FriendlyName?.Replace(" ", "-") + "_" + fileName?.Replace("_", "-");
 
                             var download = await client.GetAsync("http" + (cameraDetail?.Secure == true ? "s" : "") + "://" + cameraDetail?.HostNameOrIP + "/" + cameraDetail?.FetchPath?.Replace("$FILENAME$", fileName));
 
