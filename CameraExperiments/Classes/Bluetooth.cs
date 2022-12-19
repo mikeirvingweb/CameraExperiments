@@ -39,6 +39,8 @@ namespace CameraExperiments
                 {
                     var serv = await bd.Gatt.GetPrimaryServiceAsync((BluetoothUuid)serviceGuid);
 
+                    Thread.Sleep(2000);
+
                     var c = await serv.GetCharacteristicsAsync();
 
                     await c[0].WriteValueWithoutResponseAsync(Encoding.UTF8.GetBytes(sendCommand));
