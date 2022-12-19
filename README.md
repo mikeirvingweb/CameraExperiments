@@ -21,6 +21,11 @@
 
 🍴 Feel free to Fork / Branch / Modify, raise any Pull Requests for changes.
 
+#### Further reading  
+
+🦔 Built as part of [.NET, IoT and Hedgehogs!](https://www.mike-irving.co.uk/web-design-blog/?blogid=122)
+
+
 #### Credits
 
 🙏 Thanks to [Peter Foot](https://github.com/peterfoot) for help with Bluetooth connectivity, achieved using the [InTheHand.BluetoothLE NuGet Package](https://www.nuget.org/packages/InTheHand.BluetoothLE), part of [32feet.NET](https://github.com/inthehand/32feet).
