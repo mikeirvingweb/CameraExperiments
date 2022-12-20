@@ -39,7 +39,7 @@ namespace CameraExperiments
                 {
                     var serv = await bd.Gatt.GetPrimaryServiceAsync((BluetoothUuid)serviceGuid);
 
-                    Thread.Sleep(2000);
+                    Thread.Sleep(5000);
 
                     var c = await serv.GetCharacteristicsAsync();
 
@@ -62,6 +62,8 @@ namespace CameraExperiments
                         if (bd.Id == deviceId)
                         {
                             var serv = await bd.Gatt.GetPrimaryServiceAsync((BluetoothUuid)serviceGuid);
+
+                            Thread.Sleep(5000);
 
                             var c = await serv.GetCharacteristicsAsync();
 
