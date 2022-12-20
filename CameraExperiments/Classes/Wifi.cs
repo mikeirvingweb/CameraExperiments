@@ -49,7 +49,7 @@ namespace CameraExperiments
                                 {
                                     success = ap.Connect(authRequest, false);
                                 }
-                                catch (Win32Exception)
+                                catch (Win32Exception e)
                                 {
                                     success = false;
                                 }
