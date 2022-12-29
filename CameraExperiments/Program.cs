@@ -8,23 +8,38 @@ var settings = JsonSerializer.Deserialize<Settings>(File.ReadAllText("Settings.j
 
 var dataHelper = new DataHelper();
 
+var wifiService = new WifiService();
+
 foreach (var camera in settings.cameras)
 {
     Console.WriteLine("Processing Camera: " + camera.FriendlyName + Environment.NewLine);
-    
-    var bluetoothService = new BluetoothService();
-    var wifiService = new WifiService();
 
-    var bluetoothAwoken = await bluetoothService.BluetoothWakeUpAttemptsAsync(camera, 3);
+    var wifiSuccess = false;
+    bool? bluetoothAwoken = null;
+
+    if (wifiService.WifiAvailable())
+    {
+        wifiSuccess = wifiService.WifiIsConnectedTo(camera.WifiSSID);
+    }
+
+    if(!wifiSuccess) // skip activation if Wifi already connected
+    {
+        var bluetoothService = new BluetoothService();
+
+        bluetoothAwoken = await bluetoothService.BluetoothWakeUpAttemptsAsync(camera, 3);
+    }    
 
     if (bluetoothAwoken == null || bluetoothAwoken == true)
     {
         if (wifiService.WifiAvailable())
         {
-            wifiService.WifiDisconnect();
-            var success = wifiService.WifiConnectAttempts(camera, 3);
+            if (!wifiSuccess)
+            {
+                wifiService.WifiDisconnect();
+                wifiSuccess = wifiService.WifiConnectAttempts(camera, 3);
+            }
 
-            if(success)
+            if (wifiSuccess)
             {
                 CameraDetails? cameraDetail = dataHelper.GetCameraDetails(camera, settings.cameraDetails);
 
@@ -82,4 +97,10 @@ foreach (var camera in settings.cameras)
             }
         }
     }
+}
+
+if(!wifiService.WifiIsConnectedTo(settings.localWifiSSID))
+{
+    wifiService.WifiDisconnect();
+    wifiService.WifiConnectAttempts(null, 3);
 }
