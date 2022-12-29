@@ -1,5 +1,7 @@
 {
-  "localFilePath": "c:\\camera",
+  "localFilePath": "/cameras/Ceyomur-CY95/automated",
+  "localWifiSSID": "local-ssid",
+  "localWifiPassword": "12345678",
   "cameras": [
     {
       "FriendlyName": "Ceyomur CY95",

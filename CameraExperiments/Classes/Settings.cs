@@ -9,6 +9,8 @@ namespace CameraExperiments
     internal class Settings
     {
         public string? localFilePath { get; set; }
+        public string? localWifiSSID { get; set; }
+        public string? localWifiPassword { get; set; }
         public List<Camera>? cameras { get; set; }
         public List<CameraDetails>? cameraDetails { get; set; }
     }
