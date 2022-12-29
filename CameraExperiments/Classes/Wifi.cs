@@ -1,5 +1,6 @@
 ﻿using SimpleWifi;
 using System.ComponentModel;
+using System.Text.Json;
 
 namespace CameraExperiments
 {
@@ -20,20 +21,35 @@ namespace CameraExperiments
                 wifi.Disconnect();
         }
 
-        public bool WifiConnect(Camera camera)
+        public bool WifiConnect(Camera? camera)
         {
             bool success = false;
             int sleepOnCompletion = 10;
 
-            Console.WriteLine("Connecting Wifi Network.");
+            string ssid = "", password = "";
+
+            if (camera == null)
+            {
+                var settings = JsonSerializer.Deserialize<Settings>(File.ReadAllText("Settings.json"))!;
+
+                ssid = settings.localWifiSSID;
+                password = settings.localWifiPassword;
+            }
+            else
+            {
+                ssid = camera.WifiSSID;
+                password = camera.WifiPassword;
+            }
+
+            Console.WriteLine("Connecting Wifi Network: " + ssid);
 
             IEnumerable<AccessPoint> accessPoints = wifi.GetAccessPoints();
 
             foreach (AccessPoint ap in accessPoints)
             {
-                if (ap.Name == camera.WifiSSID)
+                if (ap.Name == ssid)
                 {
-                    AuthRequest authRequest = new AuthRequest(ap) { Password = camera.WifiSSID };
+                    AuthRequest authRequest = new AuthRequest(ap) { Password = password };
 
                     if (!ap.IsConnected)
                     {
@@ -57,7 +73,7 @@ namespace CameraExperiments
 
                             if (success)
                             {
-                                Console.WriteLine("Wifi connected - " + camera.WifiSSID);
+                                Console.WriteLine("Wifi connected - " + ssid);
                             }
                         }
                     }
@@ -80,7 +96,7 @@ namespace CameraExperiments
             return success;
         }
 
-        public bool WifiConnectAttempts(Camera camera, int numberOfAttempts)
+        public bool WifiConnectAttempts(Camera? camera, int numberOfAttempts)
         {
             int attempts = 0;
             bool success = false;
@@ -98,6 +114,23 @@ namespace CameraExperiments
             while ((attempts < numberOfAttempts) && !success);
 
             return success;
+        }
+
+        public bool WifiIsConnectedTo(string ssid)
+        {
+            var connected = false;
+            
+            IEnumerable<AccessPoint> accessPoints = wifi.GetAccessPoints();
+
+            foreach (AccessPoint ap in accessPoints)
+            {
+                if (ap.Name == ssid && ap.IsConnected)
+                {
+                    connected = true;
+                }
+            }
+
+            return connected;
         }
     }
 }
