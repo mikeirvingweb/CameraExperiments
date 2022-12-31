@@ -41,11 +41,14 @@ namespace CameraExperiments
 
                     Thread.Sleep(5000);
 
-                    var c = await serv.GetCharacteristicsAsync();
+                    if(serv != null)
+                    {
+                        var c = await serv.GetCharacteristicsAsync();
 
-                    await c[0].WriteValueWithoutResponseAsync(Encoding.UTF8.GetBytes(sendCommand));
+                        await c[0].WriteValueWithoutResponseAsync(Encoding.UTF8.GetBytes(sendCommand));
 
-                    awoken = true;
+                        awoken = true;
+                    }
                 }
             }
             catch (Exception e)
