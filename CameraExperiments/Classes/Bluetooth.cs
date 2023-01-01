@@ -39,10 +39,10 @@ namespace CameraExperiments
                 {
                     var serv = await bd.Gatt.GetPrimaryServiceAsync((BluetoothUuid)serviceGuid);
 
-                    Thread.Sleep(5000);
-
                     if(serv != null)
                     {
+                        Thread.Sleep(5000);
+
                         var c = await serv.GetCharacteristicsAsync();
 
                         await c[0].WriteValueWithoutResponseAsync(Encoding.UTF8.GetBytes(sendCommand));
@@ -66,13 +66,16 @@ namespace CameraExperiments
                         {
                             var serv = await bd.Gatt.GetPrimaryServiceAsync((BluetoothUuid)serviceGuid);
 
-                            Thread.Sleep(5000);
+                            if (serv != null)
+                            {
+                                Thread.Sleep(5000);
 
-                            var c = await serv.GetCharacteristicsAsync();
+                                var c = await serv.GetCharacteristicsAsync();
 
-                            await c[0].WriteValueWithoutResponseAsync(Encoding.UTF8.GetBytes(sendCommand));
+                                await c[0].WriteValueWithoutResponseAsync(Encoding.UTF8.GetBytes(sendCommand));
 
-                            awoken = true;
+                                awoken = true;
+                            }
                         }
                     }
                 }
