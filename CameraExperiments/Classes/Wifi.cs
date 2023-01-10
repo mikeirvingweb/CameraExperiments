@@ -43,7 +43,7 @@ namespace CameraExperiments
                     proc.Start();
 
                     string output = proc.StandardOutput.ReadToEnd();
-                    proc.WaitForExit();
+                    proc.WaitForExit(15000);
 
                     //Console.WriteLine(output);
                 }
@@ -79,7 +79,7 @@ namespace CameraExperiments
                 password = camera.WifiPassword;
             }
 
-            Console.WriteLine("Connecting Wifi Network: " + ssid);
+            Console.WriteLine("Connecting Wifi Network: " + ssid.Substring(0, 3) + "*...");
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
@@ -87,22 +87,23 @@ namespace CameraExperiments
                 {
                     ProcessStartInfo startInfo = new ProcessStartInfo()
                     {
-                        FileName = "nmcli",
-                        Arguments = "d wifi connect " + ssid + " password " + password,
+                        FileName = "Scripts/WifiLinux.sh",
+                        Arguments = ssid + " " + password,
                         RedirectStandardOutput = true,
                         CreateNoWindow = true,
-                        UseShellExecute = false
+                        UseShellExecute = false,
+                        WindowStyle = ProcessWindowStyle.Hidden
                     };
                     
                     Process proc = new Process() { StartInfo = startInfo };
                     proc.Start();
 
                     string output = proc.StandardOutput.ReadToEnd();
-                    proc.WaitForExit();
+                    proc.WaitForExit(15000);
 
                     //Console.WriteLine(output);
 
-                    if(output.ToLower().Contains("successfully activated"))
+                    if (output.ToLower().Contains("successfully activated"))
                     {
                         success = true;
                     }
@@ -149,7 +150,7 @@ namespace CameraExperiments
 
             if (success)
             {
-                Console.WriteLine("Wifi connected - " + ((camera == null)? "Primary / Local Wifi" : ssid));
+                Console.WriteLine("Wifi connected - " + ((camera == null)? "Primary / Local Wifi" : ssid.Substring(0, 3) + "*..."));
             }
 
             if (success && sleepOnCompletion > 0)
