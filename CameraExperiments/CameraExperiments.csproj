@@ -4,20 +4,37 @@
     
     <!-- change per target for InTheHand.BluetoothLE version -->
     <!--<TargetFramework>net6.0</TargetFramework>-->
-    <TargetFrameworks>net6.0-windows10.0.19041.0</TargetFrameworks>
+    <TargetFrameworks>net7.0;net6.0-windows10.0.19041.0</TargetFrameworks>
+    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('Windows'))">net6.0-windows10.0.19041.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(RuntimeIdentifier)' == 'linux-arm64'">net7.0</TargetFrameworks>
     
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+    <IsWindows Condition="$([MSBuild]::IsOSPlatform('Windows'))">true</IsWindows>
+    <IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">true</IsLinux>
+    <Platforms>AnyCPU</Platforms>
+    <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(IsLinux)'=='true'">
+    <DefineConstants>Linux</DefineConstants>
+  </PropertyGroup>
+    
   <ItemGroup>
-    <PackageReference Include="InTheHand.BluetoothLE" Version="4.0.27" />
+    <PackageReference Include="InTheHand.BluetoothLE" Version="4.0.27" Condition="'$(TargetFramework)' == 'net6.0-windows10.0.19041.0'" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
     <PackageReference Include="SimpleWifi.netstandard" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Scripts\WifiLinux.sh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Scripts\BluetoothLinux.sh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Settings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
