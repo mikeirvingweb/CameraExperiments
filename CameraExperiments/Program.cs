@@ -4,9 +4,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using System.Net;
 
-var settings = JsonSerializer.Deserialize<Settings>(File.ReadAllText("Settings.json"))!;
-
-var dataHelper = new DataHelper();
+var settings = JsonSerializer.Deserialize<Settings>(File.ReadAllText(Environment.CurrentDirectory + "//" + "Settings.json"))!;
 
 var wifiService = new WifiService();
 
@@ -41,7 +39,7 @@ foreach (var camera in settings.cameras)
 
             if (wifiSuccess)
             {
-                CameraDetails? cameraDetail = dataHelper.GetCameraDetails(camera, settings.cameraDetails);
+                CameraDetails? cameraDetail = DataHelper.GetCameraDetails(camera, settings.cameraDetails);
 
                 var httpClient = new HttpClient();
 
@@ -63,6 +61,8 @@ foreach (var camera in settings.cameras)
                             var dateTime = Convert.ToDateTime(file.XPathSelectElement("TIME")?.Value);
 
                             var saveFileName = settings.localFilePath + "/" + camera.FriendlyName!.Replace(" ", "-") + "/automated/" + dateTime.ToString("yyyy-MM-dd-HH-mm-ss") + "_" + camera.FriendlyName?.Replace(" ", "-") + "_" + fileName?.Replace("_", "-");
+
+                            Console.WriteLine("File: " + fileName + " - Requested.");
 
                             var download = await client.GetAsync("http" + (cameraDetail?.Secure == true ? "s" : "") + "://" + cameraDetail?.HostNameOrIP + "/" + cameraDetail?.FetchPath?.Replace("$FILENAME$", fileName));
 
@@ -90,7 +90,7 @@ foreach (var camera in settings.cameras)
                                 }                                
                             }
                             
-                            Console.WriteLine(fileName);
+                            Console.WriteLine("File: " + fileName  + " - Downloaded.");
                         }
                     }
                 }

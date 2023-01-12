@@ -1,5 +1,11 @@
-﻿using InTheHand.Bluetooth;
+﻿#if DEBUG
+using InTheHand.Bluetooth;
+#endif
+
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 
 namespace CameraExperiments
 {
@@ -13,14 +19,14 @@ namespace CameraExperiments
                 return awoken;
 
             string? deviceId;
-            BluetoothUuid? serviceGuid;
+            string? serviceUuidStr;
             string? sendCommand;
             int sleepOnCompletion = 0;
 
             if (camera.Type == CameraType.Ceyomur)
             {
                 deviceId = camera.BluetoothDeviceId;
-                serviceGuid = Guid.Parse("0000ffe0-0000-1000-8000-00805f9b34fb");
+                serviceUuidStr = "0000ffe0-0000-1000-8000-00805f9b34fb";
                 sendCommand = "GPIO3";
                 sleepOnCompletion = 15;
             }
@@ -31,51 +37,108 @@ namespace CameraExperiments
 
             Console.WriteLine("Attempting Bluetooth Activation.");
 
-            try // awake by specific id, if it can be seen
-            {
-                var bd = await BluetoothDevice.FromIdAsync(deviceId);
-
-                if(bd != null)
-                {
-                    var serv = await bd.Gatt.GetPrimaryServiceAsync((BluetoothUuid)serviceGuid);
-
-                    if(serv != null)
-                    {
-                        Thread.Sleep(5000);
-
-                        var c = await serv.GetCharacteristicsAsync();
-
-                        await c[0].WriteValueWithoutResponseAsync(Encoding.UTF8.GetBytes(sendCommand));
-
-                        awoken = true;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-
-            }
-
-            if (!awoken)
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 try
                 {
-                    foreach (BluetoothDevice bd in await Bluetooth.ScanForDevicesAsync())
+                    StringBuilder output = new StringBuilder();
+                    StringBuilder error = new StringBuilder();
+
+                    using (Process process = new Process())
                     {
-                        if (bd.Id == deviceId)
+                        var timeout = 30000;
+
+                        ProcessStartInfo startInfo = new ProcessStartInfo()
                         {
-                            var serv = await bd.Gatt.GetPrimaryServiceAsync((BluetoothUuid)serviceGuid);
+                            FileName = "Scripts/BluetoothLinux.sh",
+                            Arguments = DataHelper.IdToMacAddress(deviceId) + " " + serviceUuidStr + " " + Convert.ToHexString(Encoding.UTF8.GetBytes(sendCommand)),
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true,
+                            CreateNoWindow = true,
+                            UseShellExecute = false,
+                            WindowStyle = ProcessWindowStyle.Hidden
+                        };
 
-                            if (serv != null)
+                        process.StartInfo = startInfo;
+
+                        using (AutoResetEvent outputWaitHandle = new AutoResetEvent(false))
+                        using (AutoResetEvent errorWaitHandle = new AutoResetEvent(false))
+                        {
+                            process.OutputDataReceived += (sender, e) => {
+                                if (e.Data == null)
+                                {
+                                    outputWaitHandle.Set();
+                                }
+                                else
+                                {
+                                    output.AppendLine(e.Data);
+                                }
+                            };
+                            process.ErrorDataReceived += (sender, e) =>
                             {
-                                Thread.Sleep(5000);
+                                if (e.Data == null)
+                                {
+                                    errorWaitHandle.Set();
+                                }
+                                else
+                                {
+                                    error.AppendLine(e.Data);
+                                }
+                            };
 
-                                var c = await serv.GetCharacteristicsAsync();
+                            process.Start();
 
-                                await c[0].WriteValueWithoutResponseAsync(Encoding.UTF8.GetBytes(sendCommand));
+                            process.BeginOutputReadLine();
+                            process.BeginErrorReadLine();
 
-                                awoken = true;
+                            if (process.WaitForExit(timeout) &&
+                                outputWaitHandle.WaitOne(timeout) &&
+                                errorWaitHandle.WaitOne(timeout))
+                            {
+                                // Process completed. Check process.ExitCode here.
                             }
+                            else
+                            {
+                                // Timed out.
+                            }
+                        }
+                    }
+
+                    //Console.WriteLine(output);
+                    //Console.WriteLine(error);
+
+                    if (output.ToString().ToLower().Contains("written successfully"))
+                    {
+                        awoken = true;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+            else
+            {
+#if DEBUG
+                BluetoothUuid? serviceUuid = Guid.Parse(serviceUuidStr);
+
+                try // awake by specific id, if it can be seen
+                {
+                    var bd = await BluetoothDevice.FromIdAsync(deviceId);
+
+                    if (bd != null)
+                    {
+                        var serv = await bd.Gatt.GetPrimaryServiceAsync((BluetoothUuid)serviceUuid);
+
+                        if (serv != null)
+                        {
+                            Thread.Sleep(5000);
+
+                            var c = await serv.GetCharacteristicsAsync();
+
+                            await c[0].WriteValueWithoutResponseAsync(Encoding.UTF8.GetBytes(sendCommand));
+
+                            awoken = true;
                         }
                     }
                 }
@@ -83,9 +146,39 @@ namespace CameraExperiments
                 {
 
                 }
+
+                if (!awoken)
+                {
+                    try
+                    {
+                        foreach (BluetoothDevice bd in await Bluetooth.ScanForDevicesAsync())
+                        {
+                            if (bd.Id == deviceId)
+                            {
+                                var serv = await bd.Gatt.GetPrimaryServiceAsync((BluetoothUuid)serviceUuid);
+
+                                if (serv != null)
+                                {
+                                    Thread.Sleep(5000);
+
+                                    var c = await serv.GetCharacteristicsAsync();
+
+                                    await c[0].WriteValueWithoutResponseAsync(Encoding.UTF8.GetBytes(sendCommand));
+
+                                    awoken = true;
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+
+                    }
+                }
+#endif
             }
 
-            Console.WriteLine("Bluetooth Activation " + (awoken? "Successful." : "Unsuccessful."));
+            Console.WriteLine("Bluetooth Activation " + (awoken? "Successful." : "Unsuccessful.\n"));
 
             if (awoken && sleepOnCompletion > 0)
             {

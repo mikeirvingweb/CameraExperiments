@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CameraExperiments
+﻿namespace CameraExperiments
 {
     internal class DataHelper
     {
-        public CameraDetails? GetCameraDetails(Camera? camera, List<CameraDetails>? cameraDetails)
+        public static CameraDetails? GetCameraDetails(Camera? camera, List<CameraDetails>? cameraDetails)
         {
             var cameraDetail = cameraDetails?.Where(cd => cd.Type == camera?.Type).FirstOrDefault();
 
@@ -16,6 +10,23 @@ namespace CameraExperiments
                 cameraDetail!.HostNameOrIP = camera.HostNameOrIPOverride;
 
             return cameraDetail;
+        }
+
+        public static string IdToMacAddress(string id)
+        {
+            var output = "";
+
+            for (var i = 0; i < id.Length; i++)
+            {
+                if ((i % 2 == 0) && (i != 0) )
+                {
+                    output += ":";
+                }
+
+                output += id.Substring(i, 1);
+            }
+
+            return output;
         }
     }
 }
