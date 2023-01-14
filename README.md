@@ -17,6 +17,25 @@
 `WifiPassword` - set this to the Wifi Password of your camera.  
 `BluetoothDeviceId` - set this to the Bluetooth Device ID of your camera.  
 
+## 🐧 Linux (Experimental)
+
+To run, you may need to start `NetworkManager` first.
+
+`sudo systemctl start NetworkManager`
+
+**Wifi** requires `nmcli`, **Bluetooth** requires `hcitool` and `gatttool`.
+
+You will need to add execute permissions on the two script files, and the main executable.
+
+`chmod +x Scripts/BluetoothLinux.sh`  
+`chmod +x Scripts/WifiLinux.sh`  
+
+`chmod +x CameraExperiments`  
+
+Then to execute, run:  
+
+`sudo ./CameraExperiments`  
+
 ### Contributions
 
 🍴 Feel free to Fork / Branch / Modify, raise any Pull Requests for changes.
