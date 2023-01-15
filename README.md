@@ -17,7 +17,15 @@
 `WifiPassword` - set this to the Wifi Password of your camera.  
 `BluetoothDeviceId` - set this to the Bluetooth Device ID of your camera.  
 
+## 🪟 Windows  
+
+Uses `SimpleWifi` and `InTheHand.BlueToothLE`.
+
+To execute, simply run `CameraExperiments.exe`.
+
 ## 🐧 Linux (Experimental)
+
+Uses scripts / system commands in place of SimpleWifi and InTheHand.BlueToothLE.
 
 To run, you may need to start `NetworkManager` first.
 
