@@ -43,6 +43,8 @@ foreach (var camera in settings.cameras)
 
                 var httpClient = new HttpClient();
 
+                httpClient.Timeout = new TimeSpan(0, 5, 0);
+
                 var response = await httpClient.GetAsync("http" + (cameraDetail?.Secure == true ? "s" : "") + "://" + cameraDetail?.HostNameOrIP + "/" + cameraDetail?.ListPath);
                 
                 if (response.StatusCode == HttpStatusCode.OK)
