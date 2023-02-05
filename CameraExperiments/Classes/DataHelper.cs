@@ -28,5 +28,16 @@
 
             return output;
         }
+
+        public static DateTime DecimalsToDateTime(ushort decDate, ushort decTime)
+        {
+            int year = ((decDate >> 9) & 0x7F) + 1980, month = (decDate >> 5) & 0x0F, day = decDate & 0x1F;
+            int hour = (decTime >> 11) & 0x1F, minute = (decTime >> 5) & 0x3F, second = (decTime & 0x1F) * 2;
+
+            month = (month == 0) ? 1 : month;
+            day = (day == 0) ? 1 : day;
+
+            return new DateTime(year, month, day, hour, minute, second);
+        }
     }
 }
