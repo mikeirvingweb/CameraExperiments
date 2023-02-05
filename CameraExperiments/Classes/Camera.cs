@@ -9,7 +9,7 @@ namespace CameraExperiments
 {
     internal enum CameraType
     {
-        Ceyomur
+        Ceyomur, FlashAir
     }
 
     internal class Camera
@@ -22,6 +22,8 @@ namespace CameraExperiments
         public string? BluetoothDeviceId { get; set; }
         public string? HostNameOrIPOverride { get; set; }
         public bool? DeleteFiles { get; set; }
+        public string? RemoteFolder { get; set; }
+        public bool? Enabled { get; set; }
     }
 
     internal class CameraDetails
@@ -32,5 +34,6 @@ namespace CameraExperiments
         public string? ListPath { get; set; }
         public string? FetchPath { get; set; }
         public string? DeletePath { get; set; }
+        public bool? SubFolders { get; set; }
     }
 }

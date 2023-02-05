@@ -10,7 +10,18 @@
       "WifiPassword": "xxxxxxxx",
       "BluetoothActivate": true,
       "BluetoothDeviceId": "CExxxxxxxxxx",
-      "DeleteFiles": false
+      "DeleteFiles": false,
+      "Enabled": false
+    },
+    {
+      "FriendlyName": "FlashAir",
+      "Type": 1,
+      "WifiSSID": "flashair",
+      "WifiPassword": "xxxxxxxx",
+      "BluetoothActivate": false,
+      "DeleteFiles": false,
+      "RemoteFolder": "",
+      "Enabled": true
     }
   ],
   "cameraDetails": [
@@ -20,7 +31,17 @@
       "Secure": false,
       "ListPath": "?custom=1\u0026cmd=3015",
       "FetchPath": "DCIM/MOVIE/$FILENAME$",
-      "DeletePath": "DCIM/MOVIE/$FILENAME$?del=1"
+      "DeletePath": "DCIM/MOVIE/$FILENAME$?del=1",
+      "SubFolders": false
+    },
+    {
+      "Type": 1,
+      "HostNameOrIP": "flashair",
+      "Secure": false,
+      "ListPath": "command.cgi?op=100&DIR=/$DIR$",
+      "FetchPath": "$DIR$/$SUBDIR$/$FILENAME$",
+      "DeletePath": "upload.cgi?DEL=/$DIR$/$SUBDIR$/$FILENAME$",
+      "SubFolders": true
     }
   ]
 }
