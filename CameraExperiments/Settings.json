@@ -11,7 +11,10 @@
       "BluetoothActivate": true,
       "BluetoothDeviceId": "CExxxxxxxxxx",
       "DeleteFiles": false,
-      "Enabled": false
+      "Enabled": false,
+      "DiscardFootageBetweenCertainTimes": true,
+      "DiscardFootageBetweenCertainTimesStart":  "07:00:00",
+      "DiscardFootageBetweenCertainTimesEnd":  "19:00:00"
     },
     {
       "FriendlyName": "FlashAir",
@@ -21,7 +24,10 @@
       "BluetoothActivate": false,
       "DeleteFiles": false,
       "RemoteFolder": "",
-      "Enabled": true
+      "Enabled": true,
+      "DiscardFootageBetweenCertainTimes": true,
+      "DiscardFootageBetweenCertainTimesStart": "08:00:00",
+      "DiscardFootageBetweenCertainTimesEnd": "19:00:00"
     }
   ],
   "cameraDetails": [
@@ -38,9 +44,9 @@
       "Type": 1,
       "HostNameOrIP": "flashair",
       "Secure": false,
-      "ListPath": "command.cgi?op=100&DIR=/$DIR$",
-      "FetchPath": "$DIR$/$SUBDIR$/$FILENAME$",
-      "DeletePath": "upload.cgi?DEL=/$DIR$/$SUBDIR$/$FILENAME$",
+      "ListPath": "command.cgi?op=100&DIR=/$FOLDER$",
+      "FetchPath": "$FOLDER$/$FILENAME$",
+      "DeletePath": "upload.cgi?DEL=/$FOLDER$/$FILENAME$",
       "SubFolders": true
     }
   ]
