@@ -10,89 +10,142 @@ var wifiService = new WifiService();
 
 foreach (var camera in settings.cameras)
 {
-    Console.WriteLine("Processing Camera: " + camera.FriendlyName + Environment.NewLine);
-
-    var wifiSuccess = false;
-    bool? bluetoothAwoken = null;
-
-    if (wifiService.WifiAvailable())
+    if (camera.Enabled == null || camera.Enabled == true)
     {
-        wifiSuccess = wifiService.WifiIsConnectedTo(camera.WifiSSID);
-    }
+        Console.WriteLine("Processing Camera: " + camera.FriendlyName + Environment.NewLine);
 
-    if(!wifiSuccess) // skip activation if Wifi already connected
-    {
-        var bluetoothService = new BluetoothService();
+        var wifiSuccess = false;
+        bool? bluetoothAwoken = null;
 
-        bluetoothAwoken = await bluetoothService.BluetoothWakeUpAttemptsAsync(camera, 3);
-    }    
-
-    if (bluetoothAwoken == null || bluetoothAwoken == true)
-    {
         if (wifiService.WifiAvailable())
         {
-            if (!wifiSuccess)
+            wifiSuccess = wifiService.WifiIsConnectedTo(camera.WifiSSID);
+        }
+
+        if (!wifiSuccess) // skip activation if Wifi already connected
+        {
+            var bluetoothService = new BluetoothService();
+
+            bluetoothAwoken = await bluetoothService.BluetoothWakeUpAttemptsAsync(camera, 3);
+        }
+
+        if (bluetoothAwoken == null || bluetoothAwoken == true)
+        {
+            if (wifiService.WifiAvailable())
             {
-                wifiService.WifiDisconnect();
-                wifiSuccess = wifiService.WifiConnectAttempts(camera, 3);
-            }
-
-            if (wifiSuccess)
-            {
-                CameraDetails? cameraDetail = DataHelper.GetCameraDetails(camera, settings.cameraDetails);
-
-                var httpClient = new HttpClient();
-
-                httpClient.Timeout = new TimeSpan(0, 5, 0);
-
-                var response = await httpClient.GetAsync("http" + (cameraDetail?.Secure == true ? "s" : "") + "://" + cameraDetail?.HostNameOrIP + "/" + cameraDetail?.ListPath);
-                
-                if (response.StatusCode == HttpStatusCode.OK)
+                if (!wifiSuccess)
                 {
-                    var content = await response.Content.ReadAsStringAsync();
-                    XDocument xDocument = XDocument.Parse(content);
+                    wifiService.WifiDisconnect();
+                    wifiSuccess = wifiService.WifiConnectAttempts(camera, 3);
+                }
 
-                    var files = xDocument.XPathSelectElements("//File");
+                if (wifiSuccess)
+                {
+                    CameraDetails? cameraDetail = DataHelper.GetCameraDetails(camera, settings.cameraDetails);
 
-                    using (var client = new HttpClient())
+                    var listPath = "http" + (cameraDetail?.Secure == true ? "s" : "") + "://" + cameraDetail?.HostNameOrIP + "/" + cameraDetail?.ListPath;
+
+                    if(cameraDetail?.Type == CameraType.FlashAir)
                     {
-                        foreach (var file in files)
+                        listPath = listPath.Replace("$FOLDER$", (!string.IsNullOrEmpty(camera.RemoteFolder)) ? camera.RemoteFolder : "");
+                    }
+
+                    var httpClient = new HttpClient();
+
+                    httpClient.Timeout = new TimeSpan(0, 5, 0);
+
+                    var response = await httpClient.GetAsync(listPath);
+
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        var content = await response.Content.ReadAsStringAsync();
+
+                        if (cameraDetail?.Type == CameraType.Ceyomur)
                         {
-                            var fileName = file.XPathSelectElement("NAME")?.Value;
-                            var fileSize = Convert.ToInt64(file.XPathSelectElement("SIZE")?.Value);
-                            var dateTime = Convert.ToDateTime(file.XPathSelectElement("TIME")?.Value);
+                            XDocument xDocument = XDocument.Parse(content);
 
-                            var saveFileName = settings.localFilePath + "/" + camera.FriendlyName!.Replace(" ", "-") + "/automated/" + dateTime.ToString("yyyy-MM-dd-HH-mm-ss") + "_" + camera.FriendlyName?.Replace(" ", "-") + "_" + fileName?.Replace("_", "-");
+                            var files = xDocument.XPathSelectElements("//File");
 
-                            Console.WriteLine("File: " + fileName + " - Requested.");
-
-                            var download = await client.GetAsync("http" + (cameraDetail?.Secure == true ? "s" : "") + "://" + cameraDetail?.HostNameOrIP + "/" + cameraDetail?.FetchPath?.Replace("$FILENAME$", fileName));
-
-                            if (download.StatusCode == HttpStatusCode.OK)
+                            using (var client = new HttpClient())
                             {
-                                using (var fs = new FileStream(saveFileName, FileMode.CreateNew))
+                                foreach (var file in files)
                                 {
-                                    await download.Content.CopyToAsync(fs);
-                                }
+                                    var fileName = file.XPathSelectElement("NAME")?.Value;
+                                    var dateTime = Convert.ToDateTime(file.XPathSelectElement("TIME")?.Value);
 
-                                if (File.Exists(saveFileName))
-                                {
-                                    File.SetCreationTime(saveFileName, dateTime);
-                                    File.SetLastWriteTime(saveFileName, dateTime);
-                                    File.SetLastAccessTime(saveFileName, dateTime);
+                                    await FileActions.DownloadFile(client, camera, cameraDetail, "", fileName, dateTime, settings.localFilePath);
                                 }
-
-                                if(camera.DeleteFiles == true)
-                                {
-                                    var delete = await client.GetAsync("http" + (cameraDetail?.Secure == true ? "s" : "") + "://" + cameraDetail?.HostNameOrIP + "/" + cameraDetail?.DeletePath?.Replace("$FILENAME$", fileName));
-                                    if (delete.StatusCode == HttpStatusCode.OK)
-                                    {
-                                        await delete.Content.ReadAsStringAsync();
-                                    }
-                                }                                
                             }
-                            
-                            Console.WriteLine("File: " + fileName  + " - Downloaded.");
+                        }
+                        else if (cameraDetail?.Type == CameraType.FlashAir)
+                        {
+                            StringReader reader = new StringReader(content);
+
+                            string? line = reader.ReadLine(); // header line
+
+                            if (line != null)
+                            {
+                                using (var client = new HttpClient())
+                                {
+                                    while ((line = reader.ReadLine()) != null)
+                                    {
+                                        var lineVariables = line.Split(',');
+
+                                        string path = lineVariables[0],
+                                            file = lineVariables[1],
+                                            type = lineVariables[3],
+                                            date = lineVariables[4],
+                                            time = lineVariables[5];
+
+                                        if (type == "16" && cameraDetail.SubFolders == true) // folder
+                                        {
+                                            var httpClientSub = new HttpClient();
+
+                                            httpClientSub.Timeout = new TimeSpan(0, 5, 0);
+
+                                            var responseSub = await httpClientSub.GetAsync(listPath + "/" + file);
+
+                                            if (responseSub.StatusCode == HttpStatusCode.OK)
+                                            {
+                                                var contentSub = await responseSub.Content.ReadAsStringAsync();
+
+                                                StringReader readerSub = new StringReader(contentSub);
+
+                                                string? lineSub = readerSub.ReadLine(); // header line
+
+                                                if (lineSub != null)
+                                                {
+                                                    using (var clientSub = new HttpClient())
+                                                    {
+                                                        while ((lineSub = readerSub.ReadLine()) != null)
+                                                        {
+                                                            var lineVariablesSub = lineSub.Split(',');
+
+                                                            string pathSub = lineVariablesSub[0],
+                                                                fileSub = lineVariablesSub[1],
+                                                                typeSub = lineVariablesSub[3],
+                                                                dateSub = lineVariablesSub[4],
+                                                                timeSub = lineVariablesSub[5];
+
+                                                            if (typeSub == "32") // file (we will only delve one level deep)
+                                                            {
+                                                                await FileActions.DownloadFile(clientSub, camera, cameraDetail, camera.RemoteFolder + "/" + file, fileSub, DataHelper.DecimalsToDateTime(Convert.ToUInt16(dateSub), Convert.ToUInt16(timeSub)), settings.localFilePath);
+                                                            }
+                                                        }
+
+                                                        // Delete Sub Folder
+                                                        await FileActions.DeleteFile(clientSub, cameraDetail, camera.RemoteFolder, file);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        else if (type == "32") // file
+                                        {
+                                            await FileActions.DownloadFile(client, camera, cameraDetail, camera.RemoteFolder, file, DataHelper.DecimalsToDateTime(Convert.ToUInt16(date), Convert.ToUInt16(time)), settings.localFilePath);
+                                        }
+                                    };
+                                }
+                            }                            
                         }
                     }
                 }
