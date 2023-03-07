@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using System.Net;
+using System.Threading;
 
 var settings = JsonSerializer.Deserialize<Settings>(File.ReadAllText(Environment.CurrentDirectory + "//" + "Settings.json"))!;
 
@@ -129,7 +130,17 @@ foreach (var camera in settings.cameras)
 
                                                             if (typeSub == "32") // file (we will only delve one level deep)
                                                             {
-                                                                await FileActions.DownloadFile(clientSub, camera, cameraDetail, camera.RemoteFolder + "/" + file, fileSub, DataHelper.DecimalsToDateTime(Convert.ToUInt16(dateSub), Convert.ToUInt16(timeSub)), settings.localFilePath);
+                                                                if (camera.DeleteThumbnailFiles == true && !string.IsNullOrEmpty(camera.ThumbnailFileExtension))
+                                                                {
+                                                                    if(fileSub.EndsWith(camera.ThumbnailFileExtension))
+                                                                    {
+                                                                        await FileActions.DeleteFile(client, cameraDetail, camera.RemoteFolder + "/" + file, fileSub);
+                                                                    }
+                                                                }
+                                                                else
+                                                                {
+                                                                    await FileActions.DownloadFile(clientSub, camera, cameraDetail, camera.RemoteFolder + "/" + file, fileSub, DataHelper.DecimalsToDateTime(Convert.ToUInt16(dateSub), Convert.ToUInt16(timeSub)), settings.localFilePath);
+                                                                }
                                                             }
                                                         }
 
@@ -141,7 +152,17 @@ foreach (var camera in settings.cameras)
                                         }
                                         else if (type == "32") // file
                                         {
-                                            await FileActions.DownloadFile(client, camera, cameraDetail, camera.RemoteFolder, file, DataHelper.DecimalsToDateTime(Convert.ToUInt16(date), Convert.ToUInt16(time)), settings.localFilePath);
+                                            if (camera.DeleteThumbnailFiles == true && !string.IsNullOrEmpty(camera.ThumbnailFileExtension))
+                                            {
+                                                if (file.EndsWith(camera.ThumbnailFileExtension))
+                                                {
+                                                    await FileActions.DeleteFile(client, cameraDetail, camera.RemoteFolder, file);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                await FileActions.DownloadFile(client, camera, cameraDetail, camera.RemoteFolder, file, DataHelper.DecimalsToDateTime(Convert.ToUInt16(date), Convert.ToUInt16(time)), settings.localFilePath);
+                                            }
                                         }
                                     };
                                 }

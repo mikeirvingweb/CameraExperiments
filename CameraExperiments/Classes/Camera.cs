@@ -17,11 +17,16 @@ namespace CameraExperiments
         public string? BluetoothDeviceId { get; set; }
         public string? HostNameOrIPOverride { get; set; }
         public bool? DeleteFiles { get; set; }
+
+        /* To Delete Thumbnail Files, bot the Video and Thumbnail File Extensions need setting */
+        public bool? DeleteThumbnailFiles { get; set; }
+        public string? ThumbnailFileExtension { get; set; }
+
         public string? RemoteFolder { get; set; }
         public bool? Enabled { get; set; }
-        public bool? DiscardFootageBetweenCertainTimes { get; set; }
 
         /* Times in HH:mm:ss format */
+        public bool? DiscardFootageBetweenCertainTimes { get; set; }
         public string? DiscardFootageBetweenCertainTimesStart { get; set; }
         public string? DiscardFootageBetweenCertainTimesEnd { get; set; }
     }
