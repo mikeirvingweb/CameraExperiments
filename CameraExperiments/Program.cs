@@ -130,12 +130,9 @@ foreach (var camera in settings.cameras)
 
                                                             if (typeSub == "32") // file (we will only delve one level deep)
                                                             {
-                                                                if (camera.DeleteThumbnailFiles == true && !string.IsNullOrEmpty(camera.ThumbnailFileExtension))
+                                                                if (camera.DeleteThumbnailFiles == true && !string.IsNullOrEmpty(camera.ThumbnailFileExtension) && fileSub.ToLower().EndsWith(camera.ThumbnailFileExtension.ToLower()))
                                                                 {
-                                                                    if(fileSub.EndsWith(camera.ThumbnailFileExtension))
-                                                                    {
-                                                                        await FileActions.DeleteFile(client, cameraDetail, camera.RemoteFolder + "/" + file, fileSub);
-                                                                    }
+                                                                    await FileActions.DeleteFile(client, cameraDetail, camera.RemoteFolder + "/" + file, fileSub);
                                                                 }
                                                                 else
                                                                 {
@@ -152,12 +149,9 @@ foreach (var camera in settings.cameras)
                                         }
                                         else if (type == "32") // file
                                         {
-                                            if (camera.DeleteThumbnailFiles == true && !string.IsNullOrEmpty(camera.ThumbnailFileExtension))
+                                            if (camera.DeleteThumbnailFiles == true && !string.IsNullOrEmpty(camera.ThumbnailFileExtension) && file.ToLower().EndsWith(camera.ThumbnailFileExtension.ToLower()))
                                             {
-                                                if (file.EndsWith(camera.ThumbnailFileExtension))
-                                                {
-                                                    await FileActions.DeleteFile(client, cameraDetail, camera.RemoteFolder, file);
-                                                }
+                                                await FileActions.DeleteFile(client, cameraDetail, camera.RemoteFolder, file);
                                             }
                                             else
                                             {
