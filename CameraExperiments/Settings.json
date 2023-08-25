@@ -33,6 +33,7 @@
   "cameraDetails": [
     {
       "Type": 0,
+      "FriendlyName": "Ceyomur",
       "HostNameOrIP": "192.168.8.120",
       "Secure": false,
       "ListPath": "?custom=1\u0026cmd=3015",
@@ -42,6 +43,7 @@
     },
     {
       "Type": 1,
+      "FriendlyName": "Toshiba FlashAir",
       "HostNameOrIP": "flashair",
       "Secure": false,
       "ListPath": "command.cgi?op=100&DIR=/$FOLDER$",
