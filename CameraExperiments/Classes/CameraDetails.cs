@@ -9,6 +9,7 @@ namespace CameraExperiments
     internal class CameraDetails
     {
         public CameraType Type { get; set; }
+        public string? FriendlyName { get; set; }
         public string? HostNameOrIP { get; set; }
         public bool? Secure { get; set; }
         public string? ListPath { get; set; }
